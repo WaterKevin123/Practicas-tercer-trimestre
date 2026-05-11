@@ -1,0 +1,193 @@
+#include <TFT_eSPI.h>
+
+// ===== TFT =====
+TFT_eSPI tft = TFT_eSPI();
+
+// ===== Colores =====
+#define CAT_ORANGE 0xFD20
+#define CAT_DARK   0xA145
+#define CAT_BLACK  TFT_BLACK
+#define CAT_WHITE  TFT_WHITE
+#define CAT_PINK   0xFBB8
+
+void drawCat();
+
+void setup() {
+
+  Serial.begin(115200);
+
+  tft.init();
+
+  // horizontal
+  tft.setRotation(1);
+
+  // fondo
+  tft.fillScreen(TFT_SKYBLUE);
+
+  // dibujar gato
+  drawCat();
+
+  // titulo
+  tft.setTextColor(TFT_BLACK);
+
+  tft.setTextSize(2);
+
+  tft.setCursor(90, 10);
+
+  tft.print("Cartoon Cat");
+}
+
+void loop() {
+
+  delay(1000);
+}
+
+void drawCat() {
+
+  int centerX = tft.width() / 2;
+  int centerY = tft.height() / 2 + 20;
+
+  tft.fillScreen(TFT_SKYBLUE);
+
+  // ===== cuerpo =====
+  tft.fillEllipse(centerX, centerY + 20, 45, 30, CAT_ORANGE);
+
+  // ===== cabeza =====
+  tft.fillCircle(centerX, centerY - 35, 40, CAT_ORANGE);
+
+  // ===== orejas =====
+  tft.fillTriangle(
+    centerX - 30, centerY - 55,
+    centerX - 15, centerY - 95,
+    centerX, centerY - 55,
+    CAT_ORANGE
+  );
+
+  tft.fillTriangle(
+    centerX + 30, centerY - 55,
+    centerX + 15, centerY - 95,
+    centerX, centerY - 55,
+    CAT_ORANGE
+  );
+
+  // interior orejas
+  tft.fillTriangle(
+    centerX - 22, centerY - 58,
+    centerX - 15, centerY - 82,
+    centerX - 8, centerY - 58,
+    CAT_PINK
+  );
+
+  tft.fillTriangle(
+    centerX + 22, centerY - 58,
+    centerX + 15, centerY - 82,
+    centerX + 8, centerY - 58,
+    CAT_PINK
+  );
+
+  // ===== ojos =====
+  tft.fillEllipse(centerX - 15, centerY - 40, 7, 12, CAT_WHITE);
+
+  tft.fillEllipse(centerX + 15, centerY - 40, 7, 12, CAT_WHITE);
+
+  tft.fillEllipse(centerX - 15, centerY - 40, 3, 8, CAT_BLACK);
+
+  tft.fillEllipse(centerX + 15, centerY - 40, 3, 8, CAT_BLACK);
+
+  // ===== nariz =====
+  tft.fillTriangle(
+    centerX, centerY - 20,
+    centerX - 5, centerY - 10,
+    centerX + 5, centerY - 10,
+    CAT_PINK
+  );
+
+  // ===== boca =====
+  tft.drawLine(
+    centerX, centerY - 10,
+    centerX - 8, centerY - 2,
+    CAT_BLACK
+  );
+
+  tft.drawLine(
+    centerX, centerY - 10,
+    centerX + 8, centerY - 2,
+    CAT_BLACK
+  );
+
+  // ===== bigotes =====
+  tft.drawLine(
+    centerX - 10, centerY - 15,
+    centerX - 40, centerY - 20,
+    CAT_BLACK
+  );
+
+  tft.drawLine(
+    centerX - 10, centerY - 10,
+    centerX - 40, centerY - 10,
+    CAT_BLACK
+  );
+
+  tft.drawLine(
+    centerX + 10, centerY - 15,
+    centerX + 40, centerY - 20,
+    CAT_BLACK
+  );
+
+  tft.drawLine(
+    centerX + 10, centerY - 10,
+    centerX + 40, centerY - 10,
+    CAT_BLACK
+  );
+
+  // ===== patas =====
+  tft.fillRoundRect(
+    centerX - 30,
+    centerY + 35,
+    15,
+    40,
+    5,
+    CAT_ORANGE
+  );
+
+  tft.fillRoundRect(
+    centerX + 15,
+    centerY + 35,
+    15,
+    40,
+    5,
+    CAT_ORANGE
+  );
+
+  // ===== cola =====
+  for (int i = 0; i < 25; i++) {
+
+    float angle = i * 0.25;
+
+    int tailX = centerX + 50 + i;
+
+    int tailY = centerY + 10 - 10 * sin(angle);
+
+    tft.fillCircle(
+      tailX,
+      tailY,
+      6 - i * 0.15,
+      CAT_DARK
+    );
+  }
+
+  // ===== manchas =====
+  tft.fillCircle(
+    centerX - 20,
+    centerY + 15,
+    8,
+    CAT_DARK
+  );
+
+  tft.fillCircle(
+    centerX + 15,
+    centerY + 5,
+    10,
+    CAT_DARK
+  );
+}
