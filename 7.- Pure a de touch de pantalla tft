@@ -1,0 +1,114 @@
+#include <SPI.h>
+#include <TFT_eSPI.h>
+#include <XPT2046_Touchscreen.h>
+
+// ===== TFT =====
+TFT_eSPI tft = TFT_eSPI();
+
+// ===== TOUCH =====
+#define XPT2046_IRQ   36
+#define XPT2046_MOSI  32
+#define XPT2046_MISO  39
+#define XPT2046_CLK   25
+#define XPT2046_CS    33
+
+SPIClass touchSPI = SPIClass(VSPI);
+XPT2046_Touchscreen touch(XPT2046_CS, XPT2046_IRQ);
+
+// ===== Pantalla =====
+#define SCREEN_WIDTH  320
+#define SCREEN_HEIGHT 240
+
+// cursor
+int oldX = 160;
+int oldY = 120;
+
+void setup() {
+
+  Serial.begin(115200);
+
+  // ===== TFT =====
+  tft.init();
+
+  tft.setRotation(1);
+
+  tft.fillScreen(TFT_WHITE);
+
+  // marco
+  tft.drawRect(5, 5, 310, 230, TFT_BLUE);
+
+  tft.drawRect(10, 10, 300, 220, TFT_BLUE);
+
+  // titulo
+  tft.setTextColor(TFT_BLUE, TFT_WHITE);
+
+  tft.setTextSize(2);
+
+  tft.drawCentreString("PRUEBA TOUCH", 160, 20, 2);
+
+  // ===== TOUCH =====
+  touchSPI.begin(
+    XPT2046_CLK,
+    XPT2046_MISO,
+    XPT2046_MOSI,
+    XPT2046_CS
+  );
+
+  touch.begin(touchSPI);
+
+  touch.setRotation(1);
+}
+
+void loop() {
+
+  if (touch.tirqTouched() &&
+      touch.touched()) {
+
+    TS_Point p = touch.getPoint();
+
+    // convertir coordenadas
+    int x = map(p.x, 200, 3700, 0, SCREEN_WIDTH);
+
+    int y = map(p.y, 240, 3800, 0, SCREEN_HEIGHT);
+
+    int z = p.z;
+
+    // limites
+    x = constrain(x, 0, 319);
+
+    y = constrain(y, 0, 239);
+
+    // ===== borrar cursor anterior =====
+    tft.fillCircle(oldX, oldY, 8, TFT_WHITE);
+
+    // ===== dibujar movimiento =====
+    tft.drawLine(oldX, oldY, x, y, TFT_LIGHTGREY);
+
+    // ===== cursor =====
+    tft.fillCircle(x, y, 8, TFT_RED);
+
+    // guardar posicion
+    oldX = x;
+    oldY = y;
+
+    // ===== limpiar zona texto =====
+    tft.fillRect(20, 50, 280, 90, TFT_WHITE);
+
+    // ===== mostrar datos =====
+    tft.setTextColor(TFT_BLACK, TFT_WHITE);
+
+    tft.drawString("X: " + String(x), 30, 60, 2);
+
+    tft.drawString("Y: " + String(y), 30, 90, 2);
+
+    tft.drawString("Presion: " + String(z), 30, 120, 2);
+
+    // serial
+    Serial.print("X: ");
+    Serial.print(x);
+
+    Serial.print(" Y: ");
+    Serial.print(y);
+
+    Serial.print(" Z: ");
+   
