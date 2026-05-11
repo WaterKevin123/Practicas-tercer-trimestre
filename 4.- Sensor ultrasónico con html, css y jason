@@ -232,3 +232,97 @@ async function actualizar() {
 setInterval(actualizar, 1000);
 
 css
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(#87ceeb, #ffffff);
+  text-align: center;
+  transition: background 0.5s;
+}
+
+header {
+  background: #111;
+  color: white;
+  padding: 15px;
+}
+
+.panel {
+  margin: 20px;
+  font-size: 22px;
+}
+
+#estado {
+  font-size: 26px;
+  margin-top: 10px;
+}
+
+.escenario {
+  position: relative;
+  height: 400px;
+  overflow: hidden;
+}
+
+.cohete {
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  transition: all 0.5s ease;
+}
+
+.cuerpo {
+  width: 50px;
+  height: 120px;
+  background: silver;
+  border-radius: 25px;
+  position: relative;
+}
+
+.punta {
+  position: absolute;
+  top: -40px;
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 40px solid red;
+}
+
+.ventana {
+  width: 20px;
+  height: 20px;
+  background: #90caf9;
+  border-radius: 50%;
+  position: absolute;
+  top: 40px;
+  left: 15px;
+}
+
+.fuego {
+  width: 20px;
+  height: 40px;
+  background: orange;
+  position: absolute;
+  bottom: -40px;
+  left: 15px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+@keyframes fuego {
+  0% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(2); opacity: 0; }
+}
+
+.fuego.activo {
+  animation: fuego 0.3s infinite;
+}
+
+footer {
+  background: #111;
+  color: white;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
