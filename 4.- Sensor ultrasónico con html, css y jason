@@ -175,3 +175,60 @@ async function actualizar(){
 setInterval(actualizar,1000);
 
 </script>
+
+
+Json
+
+const token = "0c5067c5-d9c9-4bc9-8cc7-2345a3971a26";
+
+async function actualizar() {
+  try {
+    const res = await fetch("https://api.tago.io/data?variable=distance", {
+      headers: { "Device-Token": token }
+    });
+
+    const data = await res.json();
+
+    if (!data.result || data.result.length === 0) return;
+
+    let d = data.result[0].value;
+
+    document.getElementById("distance").innerHTML =
+      `Distance: ${d} cm`;
+
+    const cohete = document.getElementById("cohete");
+    const estado = document.getElementById("estado");
+    const fuego = document.getElementById("fuego");
+
+    let maxX = window.innerWidth - 100;
+    let posX = (d / 100) * maxX;
+    posX = Math.max(0, Math.min(posX, maxX));
+
+    let maxY = 300;
+    let posY = (d / 100) * maxY;
+
+    cohete.style.left = posX + "px";
+    cohete.style.bottom = (50 + posY) + "px";
+
+    document.body.style.background =
+      d < 20 ? "#0b1a2a" : "linear-gradient(#87ceeb, #ffffff)";
+
+    if (d < 15) {
+      estado.innerHTML = "🚨 DETENIDO";
+      fuego.classList.remove("activo");
+    } else if (d < 30) {
+      estado.innerHTML = "⚠️ DESPEGANDO";
+      fuego.classList.add("activo");
+    } else {
+      estado.innerHTML = "🟢 EN VUELO";
+      fuego.classList.add("activo");
+    }
+
+  } catch (error) {
+    console.log("Error:", error);
+  }
+}
+
+setInterval(actualizar, 1000);
+
+css
