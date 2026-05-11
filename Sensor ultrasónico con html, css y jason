@@ -1,0 +1,177 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+// ===== WIFI =====
+const char* ssid = "TU_WIFI";
+const char* password = "TU_PASSWORD";
+
+// ===== TOKEN TAGO =====
+const char* token = "TU_TOKEN_TAGO";
+
+// ===== HC-SR04 =====
+#define TRIG 5
+#define ECHO 18
+
+long duracion;
+float distancia;
+
+void setup() {
+
+  Serial.begin(115200);
+
+  // Pines ultrasónico
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+
+  // ===== CONECTAR WIFI =====
+  WiFi.begin(ssid, password);
+
+  Serial.print("Conectando WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi conectado");
+}
+
+void loop() {
+
+  // ===== MEDIR DISTANCIA =====
+
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(TRIG, LOW);
+
+  duracion = pulseIn(ECHO, HIGH);
+
+  distancia = duracion * 0.034 / 2;
+
+  // evitar errores
+  if (distancia <= 0 || distancia > 400) {
+    return;
+  }
+
+  Serial.print("Distancia: ");
+  Serial.print(distancia);
+  Serial.println(" cm");
+
+  // ===== ENVIAR A TAGO =====
+
+  if (WiFi.status() == WL_CONNECTED) {
+
+    HTTPClient http;
+
+    http.begin("https://api.tago.io/data");
+
+    http.addHeader("Content-Type", "application/json");
+
+    http.addHeader("Device-Token", token);
+
+    // JSON
+    String json = "[";
+
+    json += "{";
+    json += "\"variable\":\"distancia\",";
+    json += "\"value\":";
+    json += String(distancia);
+    json += "}";
+
+    json += "]";
+
+    int httpResponseCode = http.POST(json);
+
+    Serial.print("HTTP Response: ");
+    Serial.println(httpResponseCode);
+
+    http.end();
+  }
+
+  delay(3000);
+}
+
+
+
+
+
+
+
+
+ESTA PARTE VA AL HTML DE TAGO
+
+
+
+<div style="
+width:100%;
+height:100vh;
+background:#101820;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+font-family:Arial;
+color:white;
+border-radius:20px;
+">
+
+<h1 style="
+font-size:45px;
+margin-bottom:20px;
+">
+HC-SR04
+</h1>
+
+<div id="distancia" style="
+font-size:90px;
+font-weight:bold;
+color:#00ff99;
+">
+0 cm
+</div>
+
+<div id="estado" style="
+font-size:30px;
+margin-top:20px;
+color:#ffcc00;
+">
+Esperando datos...
+</div>
+
+</div>
+
+<script>
+
+async function actualizar(){
+
+  const datos = await widget.getData();
+
+  if(datos.length > 0){
+
+    const valor = datos[0].value;
+
+    document.getElementById("distancia").innerHTML =
+    valor + " cm";
+
+    if(valor <= 10){
+
+      document.getElementById("estado").innerHTML =
+      "OBJETO CERCA";
+
+    }else{
+
+      document.getElementById("estado").innerHTML =
+      "AREA LIBRE";
+    }
+  }
+}
+
+setInterval(actualizar,1000);
+
+</script>
