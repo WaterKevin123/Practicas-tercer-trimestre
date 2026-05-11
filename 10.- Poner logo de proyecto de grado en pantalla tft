@@ -1,0 +1,40 @@
+#include <TFT_eSPI.h>
+
+TFT_eSPI tft = TFT_eSPI();
+
+// ===== TAMAÑO IMAGEN =====
+#define IMG_W 240
+#define IMG_H 240
+
+// ===== ARRAY DE LA IMAGEN =====
+const uint16_t imagen[] PROGMEM = {
+
+  // PEGA AQUI TU ARRAY RGB565
+
+};
+
+void setup() {
+
+  tft.init();
+
+  // horizontal
+  tft.setRotation(1);
+
+  // fondo negro
+  tft.fillScreen(TFT_BLACK);
+
+  // importante para colores correctos
+  tft.setSwapBytes(true);
+
+  // ===== CENTRAR IMAGEN =====
+  int x = (tft.width()  - IMG_W) / 2;
+
+  int y = (tft.height() - IMG_H) / 2;
+
+  // mostrar imagen
+  tft.pushImage(x, y, IMG_W, IMG_H, imagen);
+}
+
+void loop() {
+
+}
